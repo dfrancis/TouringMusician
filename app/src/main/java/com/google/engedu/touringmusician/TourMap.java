@@ -23,9 +23,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
+
+import java.util.Iterator;
 
 public class TourMap extends View {
 
@@ -46,24 +49,26 @@ public class TourMap extends View {
         canvas.drawBitmap(mapImage, 0, 0, null);
         Paint pointPaint = new Paint();
         pointPaint.setColor(Color.RED);
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
-        for (Point p : list) {
-            /**
-             **
-             **  YOUR CODE GOES HERE
-             **
-             **/
+        Paint linePaint = new Paint();
+        linePaint.setColor(Color.RED);
+        linePaint.setStyle(Paint.Style.STROKE);
+        linePaint.setStrokeWidth(8);
+
+        Log.d("TourM", "onDraw start");
+        Iterator<Point> iter = list.iterator();
+        Point p = null;
+        Point prev = null;
+        while (iter.hasNext()) {
+            prev = p;
+            p = iter.next();
+            Log.d("TourM", "onDraw point");
             canvas.drawCircle(p.x, p.y, 20, pointPaint);
+            if (prev != null) {
+                canvas.drawLine(prev.x, prev.y, p.x, p.y, linePaint);
+            }
         }
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+
+        Log.d("TourM", "onDraw end");
     }
 
     @Override

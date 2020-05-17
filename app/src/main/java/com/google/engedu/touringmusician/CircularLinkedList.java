@@ -17,6 +17,7 @@ package com.google.engedu.touringmusician;
 
 
 import android.graphics.Point;
+import android.util.Log;
 
 import java.util.Iterator;
 
@@ -25,21 +26,30 @@ public class CircularLinkedList implements Iterable<Point> {
     private class Node {
         Point point;
         Node prev, next;
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+
+        Node(Point p) {
+            point = p;
+            next = null;
+            prev = null;
+        }
     }
 
-    Node head;
+    Node head = null;
 
     public void insertBeginning(Point p) {
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+        Node newNode = new Node(p);
+
+        if (head == null) {
+            newNode.next = newNode;
+            newNode.prev = newNode;
+        }
+        else {
+            newNode.next = head;
+            newNode.prev = head.prev;
+            head.prev.next = newNode;
+            head.prev = newNode;
+        }
+        head = newNode;
     }
 
     private float distanceBetween(Point from, Point to) {
@@ -48,11 +58,17 @@ public class CircularLinkedList implements Iterable<Point> {
 
     public float totalDistance() {
         float total = 0;
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+
+        Iterator<Point> iter = this.iterator();
+        Point p = null;
+        Point prev = null;
+        while (iter.hasNext()) {
+            prev = p;
+            p = iter.next();
+            if (prev != null) {
+                total += distanceBetween(prev, p);
+            }
+        }
         return total;
     }
 
@@ -109,6 +125,5 @@ public class CircularLinkedList implements Iterable<Point> {
     public Iterator<Point> iterator() {
         return new CircularLinkedListIterator();
     }
-
 
 }
