@@ -72,20 +72,99 @@ public class CircularLinkedList implements Iterable<Point> {
         return total;
     }
 
+    private void insertAfter(Point newPt, Point afterPt) {
+        Node newNode = new Node(newPt);
+        Node afterNode = head;
+        Log.d("TourM", "insertAfter start");
+        while ((afterNode != null) && (afterNode.next != head)) {
+            if (afterNode.point == afterPt) {
+                break;
+            }
+            afterNode = afterNode.next;
+        }
+
+        if (afterNode == null) {
+            newNode.next = newNode;
+            newNode.prev = newNode;
+            head = newNode;
+        }
+        else {
+            newNode.next = afterNode.next;
+            newNode.prev = afterNode;
+            afterNode.next.prev = newNode;
+            afterNode.next = newNode;
+        }
+        Log.d("TourM", "insertAfter start");
+    }
+
     public void insertNearest(Point p) {
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+        Iterator<Point> iter = this.iterator();
+        Point closestPoint = null;
+        Point nextPoint = null;
+        float closestDist = 0;
+        Log.d("TourM", "insertNearest start");
+        while (iter.hasNext()) {
+            nextPoint = iter.next();
+            float nextDist = distanceBetween(nextPoint, p);
+            if ((closestPoint == null) || (nextDist < closestDist)) {
+                closestPoint = nextPoint;
+                closestDist = nextDist;
+            }
+        }
+        if (closestPoint == null) {
+            insertBeginning(p);
+        }
+        else {
+            insertAfter(p, closestPoint);
+        }
+        Log.d("TourM", "insertNearest end");
     }
 
     public void insertSmallest(Point p) {
-        /**
-         **
-         **  YOUR CODE GOES HERE
-         **
-         **/
+        if (head == null) {
+            insertBeginning(p);
+        }
+        else if (head.next == head) {
+            insertNearest(p);
+        }
+        else {
+            float origPathLength = totalDistance();
+            float pathLengthAtBegin = origPathLength + distanceBetween(p, head.point);
+            float pathLengthSmallest = pathLengthAtBegin;
+            float pathLengthAtEnd = origPathLength + distanceBetween(p, head.prev.point);
+            if (pathLengthAtEnd < pathLengthSmallest) {
+                pathLengthSmallest = pathLengthAtEnd;
+            }
+
+            Log.d("TourM", "insertSmallest start");
+            Node prevNode = head;
+            Node nextNode = head.next;
+            Node bestPrevNode = null;
+            Node bestNextNode = null;
+            while (nextNode != head) {
+                Log.d("TourM", "insertSmallest eval");
+                float pathLength = origPathLength - distanceBetween(prevNode.point, nextNode.point)
+                        + distanceBetween(p, prevNode.point) + distanceBetween(p, nextNode.point);
+                if (pathLength < pathLengthSmallest) {
+                    bestPrevNode = prevNode;
+                    bestNextNode = nextNode;
+                    pathLengthSmallest = pathLength;
+                }
+                prevNode = nextNode;
+                nextNode = nextNode.next;
+            }
+
+            if (pathLengthSmallest == pathLengthAtBegin) {
+                insertBeginning(p);
+            }
+            else if (pathLengthSmallest == pathLengthAtEnd) {
+                insertAfter(p, head.prev.point);
+            }
+            else {
+                insertAfter(p, bestPrevNode.point);
+            }
+            Log.d("TourM", "insertSmallest end");
+        }
     }
 
     public void reset() {
